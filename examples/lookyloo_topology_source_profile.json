@@ -1,0 +1,61 @@
+{
+  "definition": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "lookyloo-topology",
+    "kind": "Api",
+    "adapter": "HttpPoller",
+    "schedule": "Manual",
+    "endpoint": "https://lookyloo.example.invalid/captures",
+    "auth_ref": null,
+    "health": "Pending",
+    "last_polled": null,
+    "last_error": null,
+    "backoff": { "secs": 5, "nanos": 0 },
+    "max_backoff": { "secs": 30, "nanos": 0 },
+    "tags": [
+      { "key": "source", "value": "lookyloo" },
+      { "key": "mode", "value": "topology" }
+    ]
+  },
+  "adapter_profile": {
+    "LookylooTopology": {
+      "config": {
+        "payload_root_pointer": "/captures",
+        "include_raw_payload": true,
+        "default_quality": 0.95,
+        "metrics": {
+          "title": null,
+          "root_url": null,
+          "final_url": null,
+          "redirect_count": null,
+          "has_error": null,
+          "error_text": null,
+          "no_index": null,
+          "category_count": null,
+          "categories_joined": null,
+          "has_parent": null,
+          "parent_capture": null,
+          "user_agent": null,
+          "referer": null,
+          "capture_dir": null
+        },
+        "include_capture_nodes": true,
+        "include_domain_nodes": true,
+        "include_capture_root_edge": true,
+        "include_capture_final_edge": true,
+        "include_redirect_chain_edges": true,
+        "include_parent_capture_edges": true,
+        "include_category_boundaries": true,
+        "include_error_boundary": true,
+        "include_no_index_boundary": true,
+        "relationship_confidence": 0.9
+      },
+      "request_profile": {
+        "timeout": { "secs": 5, "nanos": 0 },
+        "headers": [],
+        "auth": null,
+        "proxy_route": "Direct"
+      }
+    }
+  }
+}
