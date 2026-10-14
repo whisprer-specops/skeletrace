@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.1 (2026-10-14)
+
+Packaging only; the engine is unchanged apart from its version number.
+
+- Downloads for Linux and macOS, as well as Windows. A GitHub Actions workflow
+  (`.github/workflows/release.yml`) builds every release on Windows (x86_64), Linux
+  (x86_64 and ARM64) and macOS (one program for Apple silicon and Intel). It runs the
+  full checks on each system first, and test-installs each installer before publishing.
+  The Linux programs are static, so they run on any distribution.
+- Installers with a licence step. Each shows the licence and asks you to accept it, then
+  asks which folder to install into, and changes nothing else: no registry entries, no
+  PATH changes, no uninstaller. To remove SkeleTrace, delete its folder. Windows gets an
+  Inno Setup `-setup.exe`; Linux and macOS get a self-extracting `.run` file. Plain
+  `.zip` and `.tar.gz` archives sit beside them, and `SHA256SUMS.txt` lists every file's
+  checksum.
+- New `packaging/package.py` does the building and packing, on GitHub or on a desktop;
+  `packaging/product.json` names the program.
+- `scripts/export_public.py` can now refresh an existing clone of the public repository,
+  as well as fill an empty folder, and it exports the workflow and `packaging/` too.
+  `scripts/audit_standalone.py` checks the copyright lines in `packaging/` as well.
+
 ## 1.0.0 (2026-10-10)
 
 The first public release: the free Community edition, copyright whispr.dev, under

@@ -1,0 +1,11 @@
+{
+  "name": "SkeleTrace",
+  "edition": "Community",
+  "binary": "skeletrace",
+  "crate_dir": ".",
+  "url": "https://skeletrace.com",
+  "download_page": "https://skeletrace.com/download/",
+  "docs": ["README.md", "LICENSE", "CHANGELOG.md"],
+  "check_unix": "scripts/check.sh",
+  "check_windows": "scripts/check.ps1"
+}

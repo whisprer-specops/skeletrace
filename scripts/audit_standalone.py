@@ -29,8 +29,8 @@ MODULE = re.compile(r'^\s*(?:pub(?:\([^)]*\))?\s+)?mod\s+(\w+)\s*;', re.MULTILIN
 # Every code file opens with these two lines, after any #! line (see CONTRIBUTING.md).
 HEADER_COPYRIGHT = re.compile(r'Copyright \(C\) 20\d\d(?:-20\d\d)? whispr\.dev')
 HEADER_SPDX = 'SPDX-License-Identifier: GPL-3.0-only'
-CODE_FOLDERS = ['src', 'tests', 'examples', 'scripts', 'skeletrace-algo/src', 'skeletrace-algo/examples',
-                'skeletrace-algo/tests']
+CODE_FOLDERS = ['src', 'tests', 'examples', 'scripts', 'packaging', 'skeletrace-algo/src',
+                'skeletrace-algo/examples', 'skeletrace-algo/tests']
 CODE_SUFFIXES = {'.rs', '.py', '.ps1', '.sh'}
 
 

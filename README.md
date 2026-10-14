@@ -21,7 +21,7 @@
 
 # SkeleTrace
 
-Sparse spatiotemporal flow-graph engine for OSINT telemetry. Version **1.0.0**, the Community edition.
+Sparse spatiotemporal flow-graph engine for OSINT telemetry. Version **1.0.1**, the Community edition.
 Copyright © 2026 whispr.dev, free software under GPL-3.0-only.
 
 SkeleTrace stores identity-bearing nodes and relations, metric definitions and
@@ -38,9 +38,21 @@ or commands in this crate. The independent chokepoint/bridge analysis remains.
 
 ## Get it
 
-Ready-built programs, each with a SHA-256 checksum, are listed on
-[skeletrace.com/download](https://skeletrace.com/download/). To build it yourself,
-follow the steps for your system below. `skeletrace --help` lists every command.
+Ready-built programs for Windows, Linux (x86_64 and ARM64) and macOS (Apple silicon
+and Intel) are on this repository's Releases page and on
+[skeletrace.com/download](https://skeletrace.com/download/), with SHA-256 checksums.
+Each system has an installer that shows the licence, asks you to accept it, then asks
+which folder to install into. It changes nothing else: no registry entries, no PATH
+changes and no uninstaller, so removing SkeleTrace means deleting its folder. Plain
+`.zip` and `.tar.gz` archives hold the same files.
+
+- **Windows:** run the `-setup.exe`. It isn't code-signed yet, so Windows may say
+  "Windows protected your PC": click **More info**, then **Run anyway**.
+- **macOS and Linux:** open a terminal and run the `.run` file with `sh`, for example
+  `sh ~/Downloads/skeletrace-1.0.1-macos-universal.run`.
+
+To build it yourself, follow the steps for your system below. `skeletrace --help`
+lists every command.
 
 ## Build on Windows 11
 
@@ -293,8 +305,10 @@ and dependency isolation, and that every code file opens with its copyright line
 files. Both Python scripts require Python 3.11+ and only the standard library. The
 core Cargo checks need no Python.
 
-`scripts/package_release.py` builds the release program and packs it, with this
-README, the licence and the changelog, into `dist/` with a SHA-256 checksum. Each
+Releases are built by `.github/workflows/release.yml`, which runs the checks, builds and
+packs on Windows, Linux and macOS, and publishes when a version tag such as `v1.0.1` is
+pushed. `packaging/package.py` does its building and packing and also runs on a desktop.
+`scripts/package_release.py` packs a plain zip for the machine it runs on. Each
 release's changes, and what was tested, are in `CHANGELOG.md`.
 
 ## License
