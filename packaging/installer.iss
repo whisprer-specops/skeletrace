@@ -9,6 +9,9 @@
 #ifndef AppName
   #error Build this with packaging/package.py, which supplies the values.
 #endif
+#ifndef AppFolder
+  #define AppFolder AppName
+#endif
 
 [Setup]
 AppName={#AppName}
@@ -21,7 +24,7 @@ VersionInfoVersion={#AppVersion}
 VersionInfoCompany=whispr.dev
 VersionInfoCopyright=Copyright (C) 2026 whispr.dev
 VersionInfoDescription={#AppName} {#AppVersion} installer
-DefaultDirName={localappdata}\Programs\{#AppName}
+DefaultDirName={localappdata}\Programs\{#AppFolder}
 DisableDirPage=no
 UsePreviousAppDir=no
 AlwaysShowDirOnReadyPage=yes

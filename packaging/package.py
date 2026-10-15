@@ -10,13 +10,17 @@ beside this file, so the same script serves every whispr.dev program.
     package.py env                       print NAME=, BINARY=, VERSION= and CRATE_DIR= lines
     package.py build --platform P        cargo build for platform P, leaving the program in dist/bin/
     package.py pack --platform P         pack dist/bin/'s program into dist/out/
-    package.py release-files --tag vX    write dist/out/SHA256SUMS.txt and the release notes, dist/notes.md
+    package.py release-files --tag vX    add version-less copies of the downloads, then write
+                                         dist/out/SHA256SUMS.txt and the release notes, dist/notes.md
 
 Platforms, and what `pack` makes for each (all names start with <binary>-<version>-<platform>):
     windows-x86_64    -setup.exe (an installer that shows the licence) and .zip
     linux-x86_64      .run (a self-extracting installer that shows the licence) and .tar.gz
     linux-aarch64     .run and .tar.gz
     macos-universal   .run and .tar.gz (one program for Apple silicon and Intel Macs)
+
+`release-files` also copies each download to a name without the version (<binary>-<platform>...), so that
+https://github.com/OWNER/REPO/releases/latest/download/<that name> always gives the newest release.
 
 The installers ask the user to accept the licence, then ask which folder to install into, and change nothing
 else: no registry entries, no PATH changes and no uninstaller. Removing the program means deleting its folder.
@@ -187,11 +191,17 @@ Documentation: README.md in the same folder, and {info['url']}
 """
 
 
+def install_folder(info: dict) -> str:
+    """The suggested install folder's name: product.json's "folder", or the program's name."""
+    return info.get('folder') or info['name']
+
+
 def install_script(info: dict, system: str) -> str:
     template = (HERE / 'install.sh').read_text(encoding='utf-8')
     for key, value in (('NAME', info['name']), ('BINARY', info['binary']), ('VERSION', info['version']),
-                       ('SYSTEM', system), ('URL', info['url'])):
-        template = template.replace(f'@{key}@', value)
+                       ('SYSTEM', system), ('URL', info['url']), ('FOLDER', install_folder(info))):
+        # Every value sits inside single quotes in install.sh, so a ' becomes '\'' (close, quoted ', reopen).
+        template = template.replace(f'@{key}@', value.replace("'", "'\\''"))
     return template
 
 
@@ -203,9 +213,11 @@ def staged_members(info: dict, platform: str, program: Path) -> list:
     """(name inside the folder, source file, mode), the program first."""
     members = [(program_name(info, platform), program, 0o755)]
     for name in info['docs']:
-        source = info['crate'] / name if (info['crate'] / name).is_file() else ROOT / name
+        # The repository's own copy first: in a repository whose crate sits in a subfolder, the top-level
+        # README and CHANGELOG are the ones written for users.
+        source = ROOT / name if (ROOT / name).is_file() else info['crate'] / name
         if not source.is_file():
-            raise Fail(f'{name} is missing from {info["crate"]}')
+            raise Fail(f'{name} is in neither {ROOT} nor {info["crate"]}')
         members.append((Path(name).name, source, 0o644))
     return members
 
@@ -273,7 +285,8 @@ def pack(info: dict, platform: str, args: argparse.Namespace) -> list:
             iscc = tool(args.iscc, 'ISCC', "Inno Setup's ISCC.exe")
             run([iscc, '/Qp',
                  f"/DAppName={info['name']}", f"/DAppVersion={info['version']}",
-                 f"/DAppPublisherURL={info['url']}", f'/DStageDir={files}',
+                 f"/DAppPublisherURL={info['url']}", f'/DAppFolder={install_folder(info)}',
+                 f'/DStageDir={files}',
                  f"/DTermsFile={work / 'TERMS.txt'}", f"/DAfterFile={work / 'AFTER-INSTALL.txt'}",
                  f'/DOutputDir={out}', f'/DOutputBase={name}-setup',
                  HERE / 'installer.iss'])
@@ -347,6 +360,8 @@ def release_notes(info: dict, names: set) -> str:
 
 Each installer shows the licence and asks you to accept it, then asks which folder to install into. It changes nothing else: no registry entries, no PATH changes and no uninstaller. To remove {info['name']}, delete its folder. The plain archives hold the same files, for unpacking yourself.
 
+Each download is also attached without the version in its name (such as `{b}-linux-x86_64.run`). Those copies are identical, and `releases/latest/download/` links to them always give the newest release.
+
 `SHA256SUMS.txt` lists every file's SHA-256 checksum. To check a download on Windows, run `(Get-FileHash .\\FILE -Algorithm SHA256).Hash` in PowerShell; on Linux, `sha256sum FILE`; on macOS, `shasum -a 256 FILE`. The result should match that file's line.
 
 ## First run
@@ -361,14 +376,46 @@ Each installer shows the licence and asks you to accept it, then asks which fold
 """
 
 
+def latest_name(info: dict, name: str) -> str:
+    """The version-less name of a download: skeletrace-1.0.2-linux-x86_64.run -> skeletrace-linux-x86_64.run."""
+    prefix = f"{info['binary']}-{info['version']}-"
+    if not name.startswith(prefix):
+        raise Fail(f'{name} does not start with {prefix}')
+    return info['binary'] + '-' + name[len(prefix):]
+
+
+def latest_names(info: dict) -> set:
+    """Every version-less name a release can carry, so a rerun doesn't copy a copy."""
+    suffixes = ('-setup.exe', '.zip', '.run', '.tar.gz')
+    return {f"{info['binary']}-{platform}{suffix}" for platform in PLATFORMS for suffix in suffixes}
+
+
+def latest_copies(info: dict, versioned: list) -> list:
+    """Copy each download to its version-less name.
+
+    GitHub serves releases/latest/download/NAME from the newest release, so a web page can link these names
+    once and always hand out the newest version.
+    """
+    copies = []
+    for path in versioned:
+        copy = path.with_name(latest_name(info, path.name))
+        shutil.copyfile(path, copy)
+        if os.access(path, os.X_OK):
+            copy.chmod(0o755)
+        copies.append(copy)
+    return copies
+
+
 def release_files(info: dict, tag: str) -> None:
     if tag != f"v{info['version']}":
         raise Fail(f"tag {tag} does not match the version in Cargo.toml ({info['version']}); "
                    f"tag v{info['version']} instead")
     out = DIST / 'out'
-    files = sorted(path for path in out.iterdir() if path.is_file() and path.name != 'SHA256SUMS.txt')
-    if not files:
+    versioned = sorted(path for path in out.iterdir() if path.is_file() and path.name != 'SHA256SUMS.txt'
+                       and path.name not in latest_names(info))
+    if not versioned:
         raise Fail(f'nothing to release in {out}')
+    files = sorted(versioned + latest_copies(info, versioned))
     sums = ''.join(f'{sha256_of(path)}  {path.name}\n' for path in files)
     (out / 'SHA256SUMS.txt').write_text(sums, encoding='ascii', newline='\n')
     (DIST / 'notes.md').write_text(release_notes(info, {path.name for path in files}), encoding='utf-8',

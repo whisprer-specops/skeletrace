@@ -21,7 +21,7 @@
 
 # SkeleTrace
 
-Sparse spatiotemporal flow-graph engine for OSINT telemetry. Version **1.0.1**, the Community edition.
+Sparse spatiotemporal flow-graph engine for OSINT telemetry. Version **1.0.2**, the Community edition.
 Copyright © 2026 whispr.dev, free software under GPL-3.0-only.
 
 SkeleTrace stores identity-bearing nodes and relations, metric definitions and
@@ -49,7 +49,12 @@ changes and no uninstaller, so removing SkeleTrace means deleting its folder. Pl
 - **Windows:** run the `-setup.exe`. It isn't code-signed yet, so Windows may say
   "Windows protected your PC": click **More info**, then **Run anyway**.
 - **macOS and Linux:** open a terminal and run the `.run` file with `sh`, for example
-  `sh ~/Downloads/skeletrace-1.0.1-macos-universal.run`.
+  `sh ~/Downloads/skeletrace-macos-universal.run`.
+
+Every download comes twice on each release: with the version in its name, and without
+it (such as `skeletrace-linux-x86_64.run`). The two are identical. Links of the form
+`https://github.com/whisprer-specops/skeletrace/releases/latest/download/skeletrace-linux-x86_64.run`
+always give the newest release.
 
 To build it yourself, follow the steps for your system below. `skeletrace --help`
 lists every command.
@@ -306,7 +311,7 @@ files. Both Python scripts require Python 3.11+ and only the standard library. T
 core Cargo checks need no Python.
 
 Releases are built by `.github/workflows/release.yml`, which runs the checks, builds and
-packs on Windows, Linux and macOS, and publishes when a version tag such as `v1.0.1` is
+packs on Windows, Linux and macOS, and publishes when a version tag such as `v1.0.2` is
 pushed. `packaging/package.py` does its building and packing and also runs on a desktop.
 `scripts/package_release.py` packs a plain zip for the machine it runs on. Each
 release's changes, and what was tested, are in `CHANGELOG.md`.

@@ -5,7 +5,7 @@
 # The installer's last step, run by the self-extracting archive (makeself) once the licence has been
 # accepted and the files unpacked into a temporary folder. It asks for an install folder and copies the files
 # there. It changes nothing else: no PATH edits, no shell profile edits, no system folders.
-# package.py fills in the @...@ values.
+# package.py fills in the @...@ values, each inside single quotes.
 #
 #   sh NAME.run                         asks for the folder
 #   sh NAME.run -- /path/to/folder      installs there without asking
@@ -18,11 +18,12 @@ binary='@BINARY@'
 version='@VERSION@'
 system='@SYSTEM@'
 url='@URL@'
+folder='@FOLDER@'
 
 if [ "$system" = macos ]; then
-    default="$HOME/Applications/$name"
+    default="$HOME/Applications/$folder"
 else
-    default="$HOME/$name"
+    default="$HOME/$folder"
 fi
 
 target="${1:-}"

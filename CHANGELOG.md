@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.2 (2026-10-15)
+
+Packaging only; the engine is unchanged apart from its version number.
+
+- Each release now also carries every download under a name without the version, such
+  as `skeletrace-windows-x86_64-setup.exe` beside `skeletrace-1.0.2-windows-x86_64-setup.exe`.
+  The copies are identical and `SHA256SUMS.txt` lists both. GitHub serves
+  `releases/latest/download/<name>` from the newest release, so skeletrace.com/download/
+  can link those names once and always hand out the newest version.
+- `packaging/` is now shared word for word with the other whispr.dev programs' release kits. `product.json` may
+  name a suggested install folder (`"folder"`), every value placed in the Linux and macOS installer script is
+  quoted, so a name with an apostrophe works, and the installed README, LICENSE and CHANGELOG come from the top
+  of the repository first.
+
 ## 1.0.1 (2026-10-14)
 
 Packaging only; the engine is unchanged apart from its version number.
