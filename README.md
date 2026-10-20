@@ -36,6 +36,8 @@ This is the standalone SkeleTrace source release. Maxwell's Demon Detector,
 OSINTropy and CrowdWatch are separate applications; they are not build dependencies
 or commands in this crate. The independent chokepoint/bridge analysis remains.
 
+**New here?** Start with the [quickstart guide](docs/quickstart/QUICKSTART.md): a plain-English tour with pictures, from installing to your first results. It's also a [PDF](docs/quickstart/skeletrace-quickstart.pdf) to keep or print.
+
 ## Get it
 
 Ready-built programs for Windows, Linux (x86_64 and ARM64) and macOS (Apple silicon
