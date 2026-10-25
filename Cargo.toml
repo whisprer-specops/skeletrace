@@ -1,6 +1,6 @@
 [package]
 name = "skeletrace"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2021"
 rust-version = "1.87"
 description = "Sparse spatiotemporal flow-graph engine for OSINT telemetry"
